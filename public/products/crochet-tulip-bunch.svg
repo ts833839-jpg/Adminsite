@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <!-- Background Gradients -->
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#5E3853"/>
+      <stop offset="70%" stop-color="#2F1E2A"/>
+      <stop offset="100%" stop-color="#140407"/>
+    </radialGradient>
+    <linearGradient id="goldSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3E5AB"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#875314"/>
+    </linearGradient>
+    <!-- Crochet Stitch Pattern -->
+    <pattern id="crochetStitch" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M0 15 Q15 0 30 15 Q15 30 0 15" fill="none" stroke="#D4AF37" stroke-width="0.8" opacity="0.16"/>
+      <circle cx="15" cy="15" r="1.5" fill="#D4AF37" opacity="0.25"/>
+    </pattern>
+    <filter id="royalGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Layer -->
+  <rect width="800" height="800" fill="url(#bgGrad)"/>
+  <rect width="800" height="800" fill="url(#crochetStitch)"/>
+
+  <!-- Palace Arch Border -->
+  <rect x="35" y="35" width="730" height="730" rx="12" fill="none" stroke="url(#goldSheen)" stroke-width="2.5" opacity="0.75"/>
+  <rect x="47" y="47" width="706" height="706" rx="8" fill="none" stroke="#D4AF37" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.5"/>
+
+  <!-- Ornate Corner Motifs -->
+  <g stroke="#D4AF37" stroke-width="1.8" fill="none" opacity="0.8">
+    <!-- Top Left -->
+    <path d="M47,85 Q85,85 85,47"/>
+    <circle cx="85" cy="85" r="4" fill="#D4AF37"/>
+    <!-- Top Right -->
+    <path d="M753,85 Q715,85 715,47"/>
+    <circle cx="715" cy="85" r="4" fill="#D4AF37"/>
+    <!-- Bottom Left -->
+    <path d="M47,715 Q85,715 85,753"/>
+    <circle cx="85" cy="715" r="4" fill="#D4AF37"/>
+    <!-- Bottom Right -->
+    <path d="M753,715 Q715,715 715,753"/>
+    <circle cx="715" cy="715" r="4" fill="#D4AF37"/>
+  </g>
+
+  <!-- Central Ambient Mandala Halo -->
+  <circle cx="400" cy="360" r="180" fill="none" stroke="#D4AF37" stroke-width="1" stroke-dasharray="4,8" opacity="0.3"/>
+  <circle cx="400" cy="360" r="140" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity="0.25"/>
+
+  <!-- Central Illustrated Icon -->
+  
+      <!-- Crochet Rosette Flower -->
+      <g transform="translate(400, 360)">
+        <circle cx="0" cy="0" r="85" fill="#D4AF37" opacity="0.2"/>
+        <circle cx="0" cy="0" r="65" fill="#D4AF37" opacity="0.4"/>
+        <circle cx="0" cy="0" r="45" fill="#D4AF37" opacity="0.75"/>
+        <circle cx="0" cy="0" r="24" fill="#F3E5AB"/>
+        <circle cx="0" cy="0" r="10" fill="#2F1E2A"/>
+        <!-- Radiating stitches -->
+        <line x1="0" y1="-95" x2="0" y2="95" stroke="#D4AF37" stroke-width="3" stroke-dasharray="6,4"/>
+        <line x1="-95" y1="0" x2="95" y2="0" stroke="#D4AF37" stroke-width="3" stroke-dasharray="6,4"/>
+        <line x1="-67" y1="-67" x2="67" y2="67" stroke="#D4AF37" stroke-width="3" stroke-dasharray="6,4"/>
+        <line x1="67" y1="-67" x2="-67" y2="67" stroke="#D4AF37" stroke-width="3" stroke-dasharray="6,4"/>
+      </g>
+    
+
+  <!-- Brand & Product Banner Plaque -->
+  <g transform="translate(400, 620)" text-anchor="middle">
+    <!-- Plaque backdrop -->
+    <rect x="-280" y="-35" width="560" height="90" rx="8" fill="#180509" stroke="url(#goldSheen)" stroke-width="1.5" opacity="0.95"/>
+    <rect x="-274" y="-29" width="548" height="78" rx="6" fill="none" stroke="#D4AF37" stroke-width="0.7" stroke-dasharray="4,3" opacity="0.5"/>
+
+    <!-- Category Tag -->
+    <text y="-8" font-family="'Playfair Display', serif" font-size="14" fill="#D4AF37" letter-spacing="4" font-weight="600">
+      KNOT & BLOOM • PASTEL BOUQUET
+    </text>
+
+    <!-- Product Title -->
+    <text y="24" font-family="'Playfair Display', Georgia, serif" font-size="20" fill="#FAF6F0" font-weight="700">
+      Spring Sunshine Crochet Tulips
+    </text>
+
+    <!-- Artisan Seal Statement -->
+    <text y="42" font-family="'Inter', sans-serif" font-size="11" fill="#C59B27" letter-spacing="1">
+      100% HANDCRAFTED CROCHET • PURE YARN HEIRLOOM
+    </text>
+  </g>
+</svg>
