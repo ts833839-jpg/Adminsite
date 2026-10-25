@@ -144,6 +144,15 @@ export async function POST(req: NextRequest) {
     const numMrp = mrp ? parseFloat(mrp) : numPrice;
     const discountPercent = numMrp > numPrice ? Math.round(((numMrp - numPrice) / numMrp) * 100) : 0;
 
+    // Ensure unique SKU
+    const baseSku = (sku && sku.trim()) || `KB-CR-${Date.now().toString().slice(-6)}`;
+    const existingSku = await prisma.product.findUnique({ where: { sku: baseSku } }).catch(() => null);
+    const finalSku = existingSku ? `${baseSku}-${Math.floor(100 + Math.random() * 900)}` : baseSku;
+
+    const productImages = Array.isArray(images) && images.length > 0
+      ? images
+      : ['/products/placeholder-royal.svg'];
+
     const product = await prisma.product.create({
       data: {
         name,
@@ -159,13 +168,13 @@ export async function POST(req: NextRequest) {
         mrp: numMrp,
         discountPercent: 0,
         stock: parseInt(stock || '1', 10),
-        sku: sku || `KB-CR-${Date.now().toString().slice(-6)}`,
+        sku: finalSku,
         badge: null,
         tags: tags || 'crochet, handcrafted',
         isUnder499: false,
         isNewArrival: false,
         images: {
-          create: (images || ['/products/placeholder-royal.svg']).map((url: string, idx: number) => ({
+          create: productImages.map((url: string, idx: number) => ({
             url,
             isPrimary: idx === 0,
             order: idx,
@@ -190,17 +199,24 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create inventory record
-    await prisma.inventory.create({
-      data: {
-        productId: product.id,
-        stock: product.stock,
-      },
-    });
+    // Safely create inventory record (non-blocking)
+    try {
+      await prisma.inventory.create({
+        data: {
+          productId: product.id,
+          stock: product.stock,
+        },
+      });
+    } catch (invErr) {
+      console.warn('Inventory creation skipped:', invErr);
+    }
 
     return NextResponse.json({ success: true, product }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Products POST Error:', error);
-    return NextResponse.json({ error: 'Failed to create product.' }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || 'Failed to create product.' },
+      { status: 500 }
+    );
   }
 }
