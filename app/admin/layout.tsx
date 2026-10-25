@@ -81,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div>
           {/* Logo & Admin Title */}
           <div className="p-6 border-b border-gold-500/15">
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link href="/admin" className="flex items-center gap-2 group">
               <span className="text-gold-400 text-lg font-serif">⚜</span>
               <span className="font-serif text-xl font-bold tracking-[0.16em] text-ivory-100 group-hover:text-gold-400 transition-colors">
                 KNOT & BLOOM
@@ -121,14 +121,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Bottom User Profile & External Store Link */}
         <div className="p-4 border-t border-gold-500/15 space-y-2">
-          <Link
-            href="/"
+          <a
+            href="https://knotndbloom.netlify.app"
             target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs text-gold-400 hover:bg-charcoal-900 transition-colors"
           >
-            <span>View Public Portfolio</span>
+            <span>View Live Customer Site ↗</span>
             <ExternalLink className="w-3.5 h-3.5" />
-          </Link>
+          </a>
 
           <button
             onClick={logout}

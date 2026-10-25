@@ -7,29 +7,12 @@ import { WishlistProvider } from '@/components/providers/WishlistProvider';
 import { StoreLayoutShell } from '@/components/layout/StoreLayoutShell';
 
 export const metadata: Metadata = {
-  title: 'KNOT & BLOOM — Handcrafted Crochet Luxury | Discover Something Worth Keeping',
+  title: 'KNOT & BLOOM — Admin Studio & Atelier Command Center',
   description:
-    'Knot & Bloom is India’s premier handcrafted crochet boutique. Explore artisan crochet keychains, royal potli bags, luxury shrugs, everlasting yarn flower bouquets, and keepsake gifts made with pure organic yarn.',
-  keywords: [
-    'Knot and Bloom',
-    'Knot & Bloom',
-    'crochet boutique',
-    'handcrafted crochet India',
-    'crochet keychain',
-    'crochet bag',
-    'crochet potli',
-    'crochet shrug',
-    'crochet flowers bouquet',
-    'bespoke artisan crochet',
-    'luxury crochet gifts',
-  ],
-  openGraph: {
-    title: 'KNOT & BLOOM — Discover Something Worth Keeping',
-    description: 'India’s premier handcrafted luxury crochet boutique.',
-    url: 'https://knotandbloom.in',
-    siteName: 'KNOT & BLOOM',
-    locale: 'en_IN',
-    type: 'website',
+    'Dedicated administrative management studio for Knot & Bloom: manage bespoke creations, Cloudinary media, categories, and patron inquiries.',
+  robots: {
+    index: false,
+    follow: false,
   },
 };
 
