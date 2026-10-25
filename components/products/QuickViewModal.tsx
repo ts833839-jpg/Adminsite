@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { X, Heart, MessageCircle, Eye, ArrowRight, Sparkles, Phone, Mail } from 'lucide-react';
+import { X, Heart, MessageCircle, Eye, ArrowRight, Sparkles, Phone, Mail, Maximize2 } from 'lucide-react';
 import { ProductType, ProductVariantType } from '@/types';
 import { useWishlist } from '../providers/WishlistProvider';
+import { ImagePreviewModal } from '../common/ImagePreviewModal';
 
 interface QuickViewModalProps {
   product: ProductType | null;
@@ -22,6 +23,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantType | null>(
     product.variants?.[0] || null
   );
+  const [showPreview, setShowPreview] = useState(false);
 
   const isFavorited = isInWishlist(product.id);
 
@@ -40,9 +42,13 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
           <X className="w-5 h-5" />
         </button>
 
-        {/* Left: Gallery */}
-        <div className="md:w-1/2 p-6 flex flex-col items-center justify-between bg-maroon-950/5">
-          <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white shadow-inner mb-4">
+        {/* Left: Gallery - Zero uncropped view */}
+        <div className="md:w-1/2 p-6 flex flex-col items-center justify-between bg-gradient-to-b from-ivory-100/70 to-sand-light/30">
+          <div
+            onClick={() => setShowPreview(true)}
+            className="relative aspect-square w-full rounded-xl overflow-hidden bg-white shadow-inner mb-4 cursor-zoom-in group/qv flex items-center justify-center"
+            title="Click for full uncropped preview (Amazon/Flipkart style)"
+          >
             {selectedImg && (selectedImg.endsWith('.mp4') || selectedImg.endsWith('.webm') || selectedImg.includes('/video/upload/')) ? (
               <video
                 src={selectedImg}
@@ -51,15 +57,19 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                 loop
                 muted
                 playsInline
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-2"
               />
             ) : (
               <img
                 src={selectedImg}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover/qv:scale-105"
               />
             )}
+            <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full bg-maroon-950/80 text-gold-200 text-[10px] font-semibold flex items-center gap-1 shadow-md pointer-events-none">
+              <Maximize2 className="w-3 h-3 text-gold-400" />
+              <span>Full View</span>
+            </div>
           </div>
 
           {/* Thumbnails */}
@@ -71,14 +81,14 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                   <button
                     key={img.id || idx}
                     onClick={() => setSelectedImg(img.url)}
-                    className={`w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 transition-all relative ${
+                    className={`w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 transition-all bg-white relative flex items-center justify-center ${
                       selectedImg === img.url ? 'border-gold-500 shadow-sm' : 'border-transparent opacity-70'
                     }`}
                   >
                     {isItemVideo ? (
-                      <video src={img.url} className="w-full h-full object-cover" muted />
+                      <video src={img.url} className="w-full h-full object-contain p-0.5" muted />
                     ) : (
-                      <img src={img.url} alt="thumbnail" className="w-full h-full object-cover" />
+                      <img src={img.url} alt="thumbnail" className="w-full h-full object-contain p-0.5" />
                     )}
                   </button>
                 );
@@ -189,6 +199,22 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
           </div>
         </div>
       </div>
+
+      {/* Amazon / Flipkart Style Full View Lightbox Modal */}
+      <ImagePreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        images={(product.images || []).map((img) => ({
+          url: img.url,
+          alt: product.name,
+          title: product.name,
+        }))}
+        initialIndex={Math.max(
+          0,
+          (product.images || []).findIndex((i) => i.url === selectedImg)
+        )}
+        productTitle={product.name}
+      />
     </div>
   );
 }

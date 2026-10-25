@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Sparkles, CheckCircle2 } from 'lucide-react';
+import { Sparkles, CheckCircle2, Maximize2 } from 'lucide-react';
+import { ImagePreviewModal } from '../common/ImagePreviewModal';
 
 interface ShowcaseImage {
   id: string;
@@ -52,17 +53,22 @@ const SHOWCASE_ITEMS: ShowcaseImage[] = [
 
 export default function ArtisanGenesisShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
   const activeItem = SHOWCASE_ITEMS[activeIndex];
 
   return (
     <div className="space-y-4">
-      {/* Main Showcase Visual */}
-      <div className="relative group rounded-3xl overflow-hidden border-2 border-gold-500/40 shadow-royal-lg aspect-[4/3] bg-maroon-950 transition-all duration-500">
+      {/* Main Showcase Visual - Click to view full uncropped preview */}
+      <div
+        onClick={() => setShowPreview(true)}
+        className="relative group rounded-3xl overflow-hidden border-2 border-gold-500/40 shadow-royal-lg aspect-[4/3] bg-maroon-950 flex items-center justify-center p-3 cursor-zoom-in transition-all duration-500"
+        title="Click to view full uncropped creation (Amazon/Flipkart style preview)"
+      >
         <img
           key={activeItem.id}
           src={activeItem.cdnUrl}
           alt={activeItem.title}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (target.src !== activeItem.localFallback) {
@@ -72,13 +78,19 @@ export default function ArtisanGenesisShowcase() {
         />
 
         {/* Authenticity Badge */}
-        <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5 px-3 py-1 rounded-full bg-maroon-950/85 backdrop-blur-md border border-gold-400/40 text-[11px] font-semibold text-gold-300 shadow-md">
+        <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5 px-3 py-1 rounded-full bg-maroon-950/85 backdrop-blur-md border border-gold-400/40 text-[11px] font-semibold text-gold-300 shadow-md pointer-events-none">
           <Sparkles className="w-3 h-3 text-gold-400" />
           <span>Authentic Atelier Creation</span>
         </div>
 
+        {/* Bottom Full View Action Pill */}
+        <div className="absolute bottom-3.5 right-3.5 z-10 px-3 py-1.5 rounded-full bg-maroon-900/90 group-hover:bg-gold-500 text-gold-200 group-hover:text-maroon-950 border border-gold-400/40 text-xs font-semibold flex items-center gap-1.5 shadow-royal transition-all">
+          <Maximize2 className="w-3.5 h-3.5" />
+          <span>Click for Full View</span>
+        </div>
+
         {/* Caption Overlay */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-maroon-950/95 via-maroon-950/60 to-transparent p-5 pt-12 text-ivory-50 flex flex-col justify-end">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-maroon-950/95 via-maroon-950/50 to-transparent p-5 pt-12 text-ivory-50 flex flex-col justify-end pointer-events-none">
           <p className="font-serif text-base sm:text-lg font-bold text-gold-200">
             {activeItem.title}
           </p>
@@ -98,7 +110,7 @@ export default function ArtisanGenesisShowcase() {
               key={item.id}
               type="button"
               onClick={() => setActiveIndex(idx)}
-              className={`relative rounded-xl overflow-hidden aspect-[4/3] border transition-all duration-300 text-left focus:outline-none ${
+              className={`relative rounded-xl overflow-hidden aspect-[4/3] border transition-all duration-300 text-left focus:outline-none bg-maroon-950 flex items-center justify-center p-1 ${
                 isSelected
                   ? 'border-gold-500 ring-2 ring-gold-400/50 scale-[1.02] shadow-gold-glow'
                   : 'border-sand-dark/60 opacity-70 hover:opacity-100 hover:border-gold-400/60'
@@ -108,7 +120,7 @@ export default function ArtisanGenesisShowcase() {
               <img
                 src={item.cdnUrl}
                 alt={item.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   if (target.src !== item.localFallback) {
@@ -123,6 +135,19 @@ export default function ArtisanGenesisShowcase() {
           );
         })}
       </div>
+
+      {/* Amazon / Flipkart Style Full View Lightbox Modal */}
+      <ImagePreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        images={SHOWCASE_ITEMS.map((item) => ({
+          url: item.cdnUrl,
+          alt: item.title,
+          title: item.title,
+        }))}
+        initialIndex={activeIndex}
+        productTitle={activeItem.title}
+      />
     </div>
   );
 }

@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Heart, Eye, ArrowRight, MessageCircle, Phone, Mail } from 'lucide-react';
+import { Heart, Eye, ArrowRight, MessageCircle, Phone, Mail, Maximize2 } from 'lucide-react';
 import { ProductType } from '@/types';
 import { useWishlist } from '../providers/WishlistProvider';
+import { ImagePreviewModal } from '../common/ImagePreviewModal';
 
 interface ProductCardProps {
   product: ProductType;
@@ -14,6 +15,7 @@ interface ProductCardProps {
 export function ProductCard({ product, onQuickView }: ProductCardProps) {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Strictly prevent any blank or picture-less cards from rendering anywhere
   if (
@@ -48,8 +50,24 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Top Media Container */}
-      <div className="relative aspect-square w-full overflow-hidden bg-maroon-950/5">
+      {/* Top Media Container - Full uncropped preview */}
+      <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-b from-ivory-100/70 via-ivory-50 to-sand-light/40 flex items-center justify-center">
+        {/* Full Image Preview Trigger (Flipkart/Amazon style) */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setShowPreview(true);
+          }}
+          aria-label="Full screen image preview"
+          className="absolute top-3 left-3 z-20 px-2.5 py-1 rounded-full bg-ivory-50/90 hover:bg-maroon-900 text-charcoal-700 hover:text-gold-300 border border-sand-dark/60 hover:border-gold-400 shadow-md flex items-center gap-1 text-[11px] font-semibold transition-all group/btn"
+          title="Click for Full View (No crop)"
+        >
+          <Maximize2 className="w-3.5 h-3.5 text-gold-600 group-hover/btn:text-gold-300" />
+          <span className="hidden sm:inline">Full View</span>
+        </button>
+
         {/* Wishlist / Save Favorite */}
         <button
           onClick={handleWishlist}
@@ -64,7 +82,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
         </button>
 
         {/* Product Image / Video Link */}
-        <Link href={`/product/${product.slug}`} className="block w-full h-full">
+        <Link href={`/product/${product.slug}`} className="block w-full h-full p-2.5 flex items-center justify-center">
           {isVideo ? (
             <video
               src={primaryImg}
@@ -72,13 +90,13 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
               autoPlay
               loop
               playsInline
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105"
             />
           ) : (
             <img
               src={isHovered ? secondaryImg : primaryImg}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-105"
               loading="lazy"
             />
           )}
@@ -86,13 +104,18 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
 
         {/* Desktop Floating Action Overlays */}
         <div className="hidden lg:flex absolute inset-x-3 bottom-3 z-20 gap-2 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-          <Link
-            href={`/product/${product.slug}`}
-            className="flex-1 py-2 px-3 bg-ivory-50/95 hover:bg-ivory-50 text-maroon-950 font-semibold text-xs rounded-xl shadow-md border border-gold-400/40 hover:border-gold-500 flex items-center justify-center gap-1.5 transition-colors"
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowPreview(true);
+            }}
+            className="flex-1 py-2 px-3 bg-ivory-50/95 hover:bg-maroon-900 text-maroon-950 hover:text-gold-300 font-semibold text-xs rounded-xl shadow-md border border-gold-400/40 hover:border-gold-500 flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Eye className="w-3.5 h-3.5 text-gold-600" />
-            <span>View Creation</span>
-          </Link>
+            <Maximize2 className="w-3.5 h-3.5 text-gold-600" />
+            <span>Full Preview</span>
+          </button>
 
           <a
             href={`https://wa.me/919080236848?text=${whatsappMessage}`}
@@ -168,6 +191,18 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Amazon / Flipkart Style Full View Lightbox Modal */}
+      <ImagePreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        images={(product.images || []).map((img) => ({
+          url: img.url,
+          alt: product.name,
+          title: product.name,
+        }))}
+        productTitle={product.name}
+      />
     </div>
   );
 }
