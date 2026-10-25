@@ -1,0 +1,39 @@
+# Netlify Configuration for Knot & Bloom Admin Studio
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  DATABASE_URL = "file:./prisma/dev.db"
+  JWT_SECRET = "knotandbloom-luxury-secret-key-super-secure-2026"
+  NEXTAUTH_SECRET = "knotandbloom-luxury-secret-key-super-secure-2026"
+  CLOUDINARY_CLOUD_NAME = "zsjpdh9i"
+  CLOUDINARY_API_KEY = "615289681921531"
+  CLOUDINARY_API_SECRET = "QKPzHR5lpx18l0D_3sHtWPUlPE0"
+  CLOUDINARY_URL = "cloudinary://615289681921531:QKPzHR5lpx18l0D_3sHtWPUlPE0@zsjpdh9i"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/products/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

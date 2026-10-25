@@ -43,27 +43,46 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
         {/* Left: Gallery */}
         <div className="md:w-1/2 p-6 flex flex-col items-center justify-between bg-maroon-950/5">
           <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white shadow-inner mb-4">
-            <img
-              src={selectedImg}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+            {selectedImg && (selectedImg.endsWith('.mp4') || selectedImg.endsWith('.webm') || selectedImg.includes('/video/upload/')) ? (
+              <video
+                src={selectedImg}
+                controls
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={selectedImg}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
 
           {/* Thumbnails */}
           {product.images && product.images.length > 1 && (
             <div className="flex gap-2 overflow-x-auto w-full pb-2">
-              {product.images.map((img, idx) => (
-                <button
-                  key={img.id || idx}
-                  onClick={() => setSelectedImg(img.url)}
-                  className={`w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 transition-all ${
-                    selectedImg === img.url ? 'border-gold-500 shadow-sm' : 'border-transparent opacity-70'
-                  }`}
-                >
-                  <img src={img.url} alt="thumbnail" className="w-full h-full object-cover" />
-                </button>
-              ))}
+              {product.images.map((img, idx) => {
+                const isItemVideo = img.url.endsWith('.mp4') || img.url.endsWith('.webm') || img.url.includes('/video/upload/');
+                return (
+                  <button
+                    key={img.id || idx}
+                    onClick={() => setSelectedImg(img.url)}
+                    className={`w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 transition-all relative ${
+                      selectedImg === img.url ? 'border-gold-500 shadow-sm' : 'border-transparent opacity-70'
+                    }`}
+                  >
+                    {isItemVideo ? (
+                      <video src={img.url} className="w-full h-full object-cover" muted />
+                    ) : (
+                      <img src={img.url} alt="thumbnail" className="w-full h-full object-cover" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>

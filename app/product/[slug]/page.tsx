@@ -226,30 +226,54 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               </button>
             </div>
 
-            {/* Main Showcase Image */}
-            <img
-              src={selectedImg || '/products/placeholder-royal.svg'}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+            {/* Main Showcase Image / Video */}
+            {selectedImg && (selectedImg.endsWith('.mp4') || selectedImg.endsWith('.webm') || selectedImg.includes('/video/upload/')) ? (
+              <video
+                src={selectedImg}
+                controls
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={selectedImg || '/products/placeholder-royal.svg'}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            )}
           </div>
 
-          {/* Thumbnails if multiple images */}
+          {/* Thumbnails if multiple images/videos */}
           {product.images && product.images.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-2">
-              {product.images.map((img) => (
-                <button
-                  key={img.id}
-                  onClick={() => setSelectedImg(img.url)}
-                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
-                    selectedImg === img.url
-                      ? 'border-gold-500 ring-2 ring-gold-400/40'
-                      : 'border-sand-dark opacity-75 hover:opacity-100'
-                  }`}
-                >
-                  <img src={img.url} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
+              {product.images.map((img) => {
+                const isItemVideo = img.url.endsWith('.mp4') || img.url.endsWith('.webm') || img.url.includes('/video/upload/');
+                return (
+                  <button
+                    key={img.id}
+                    onClick={() => setSelectedImg(img.url)}
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all relative ${
+                      selectedImg === img.url
+                        ? 'border-gold-500 ring-2 ring-gold-400/40'
+                        : 'border-sand-dark opacity-75 hover:opacity-100'
+                    }`}
+                  >
+                    {isItemVideo ? (
+                      <video src={img.url} className="w-full h-full object-cover" muted />
+                    ) : (
+                      <img src={img.url} alt="" className="w-full h-full object-cover" />
+                    )}
+                    {isItemVideo && (
+                      <span className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-charcoal-950/80 text-[8px] font-bold text-gold-300">
+                        VIDEO
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
 

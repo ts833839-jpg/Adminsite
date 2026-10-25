@@ -107,7 +107,28 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({ success: true, product: updated });
+    if (body.images && Array.isArray(body.images)) {
+      await prisma.productImage.deleteMany({ where: { productId: existing.id } });
+      await prisma.productImage.createMany({
+        data: body.images.map((url: string, idx: number) => ({
+          productId: existing.id,
+          url,
+          isPrimary: idx === 0,
+          order: idx,
+        })),
+      });
+    }
+
+    const reloaded = await prisma.product.findUnique({
+      where: { id: existing.id },
+      include: {
+        images: { orderBy: { order: 'asc' } },
+        category: true,
+        variants: true,
+      },
+    });
+
+    return NextResponse.json({ success: true, product: reloaded || updated });
   } catch (error) {
     console.error('Product PUT Error:', error);
     return NextResponse.json({ error: 'Failed to update product.' }, { status: 500 });

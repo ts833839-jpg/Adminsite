@@ -30,6 +30,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
   const isFavorited = isInWishlist(product.id);
   const primaryImg = product.images[0].url;
   const secondaryImg = product.images[1]?.url || primaryImg;
+  const isVideo = primaryImg.endsWith('.mp4') || primaryImg.endsWith('.webm') || primaryImg.includes('/video/upload/');
 
   const whatsappMessage = encodeURIComponent(
     `Hello, I would like to inquire/order the handcrafted creation: "${product.name}". Please share details on bespoke order & dispatch.`
@@ -62,14 +63,25 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           <Heart className={`w-4 h-4 ${isFavorited ? 'fill-gold-400 text-gold-400' : ''}`} />
         </button>
 
-        {/* Product Image Link */}
+        {/* Product Image / Video Link */}
         <Link href={`/product/${product.slug}`} className="block w-full h-full">
-          <img
-            src={isHovered ? secondaryImg : primaryImg}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            loading="lazy"
-          />
+          {isVideo ? (
+            <video
+              src={primaryImg}
+              muted
+              autoPlay
+              loop
+              playsInline
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+          ) : (
+            <img
+              src={isHovered ? secondaryImg : primaryImg}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              loading="lazy"
+            />
+          )}
         </Link>
 
         {/* Desktop Floating Action Overlays */}

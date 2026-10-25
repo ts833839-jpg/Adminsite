@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronRight, ArrowLeft, Plus, Trash2, Sparkles, Check } from 'lucide-react';
 import { CategoryType } from '@/types';
 import { useToast } from '@/components/providers/ToastProvider';
+import { CloudinaryUploader } from '@/components/admin/CloudinaryUploader';
 
 export default function AdminNewProductPage() {
   const router = useRouter();
@@ -26,8 +27,7 @@ export default function AdminNewProductPage() {
   const [careInstructions, setCareInstructions] = useState('Gentle cold handwash, dry flat in shade');
 
   // Images list
-  const [images, setImages] = useState<string[]>(['/products/gallery/emerald-and-magenta-crochet-flower-mat.png']);
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadCategories() {
@@ -47,16 +47,6 @@ export default function AdminNewProductPage() {
     loadCategories();
     setSku(`KB-CR-${Math.floor(1000 + Math.random() * 9000)}`);
   }, []);
-
-  const handleAddImage = () => {
-    if (!newImageUrl.trim()) return;
-    setImages([...images, newImageUrl.trim()]);
-    setNewImageUrl('');
-  };
-
-  const handleRemoveImage = (idx: number) => {
-    setImages(images.filter((_, i) => i !== idx));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,56 +202,23 @@ export default function AdminNewProductPage() {
           </div>
         </div>
 
-        {/* 2. Creation Images */}
+        {/* 2. Creation Media & Photography (Auto Cloudinary Upload) */}
         <div className="p-6 rounded-2xl bg-ivory-50 border border-sand-dark/50 shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-sand-dark/30">
-            <h3 className="font-serif text-lg font-bold text-maroon-950">
-              2. Photography & Angles
-            </h3>
-            <span className="text-[11px] text-charcoal-500">
-              URLs or file paths in /products/gallery/
+            <div>
+              <h3 className="font-serif text-lg font-bold text-maroon-950">
+                2. Photography & Videos
+              </h3>
+              <p className="text-[11px] text-charcoal-500">
+                Uploaded files automatically upload to Cloudinary and convert to fast WebP format
+              </p>
+            </div>
+            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-full border border-emerald-300">
+              ⚡ Cloudinary Connected
             </span>
           </div>
 
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              placeholder="e.g. /products/gallery/blue-and-white-crocheted-baby-romper-11.png"
-              className="flex-1 bg-ivory-100 border border-sand-dark px-3.5 py-2.5 rounded-xl text-charcoal-900 focus:outline-none focus:border-gold-500 font-mono text-[11px]"
-            />
-            <button
-              type="button"
-              onClick={handleAddImage}
-              className="px-4 py-2.5 rounded-xl btn-gold font-semibold flex items-center gap-1"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Image</span>
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-3 pt-2">
-            {images.map((img, idx) => (
-              <div
-                key={idx}
-                className="relative w-24 h-24 rounded-xl border border-gold-500/30 overflow-hidden bg-maroon-950/10 group"
-              >
-                <img src={img} alt="Creation preview" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-charcoal-950/80 text-gold-300 text-[9px] font-mono">
-                  {idx === 0 ? 'Primary' : `#${idx + 1}`}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(idx)}
-                  className="absolute top-1 right-1 p-1 rounded-full bg-red-800 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                  title="Remove image"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
+          <CloudinaryUploader images={images} onChange={setImages} />
         </div>
 
         {/* 3. Craft Specifications & Story */}

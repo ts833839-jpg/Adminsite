@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, Sparkles } from 'lucide-react';
 import { CategoryType } from '@/types';
 import { useToast } from '@/components/providers/ToastProvider';
+import { CloudinaryUploader } from '@/components/admin/CloudinaryUploader';
 
 export default function AdminEditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function AdminEditProductPage({ params }: { params: { id: string 
   const [materials, setMaterials] = useState('');
   const [dimensions, setDimensions] = useState('');
   const [careInstructions, setCareInstructions] = useState('');
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -52,6 +54,9 @@ export default function AdminEditProductPage({ params }: { params: { id: string 
           setMaterials(p.materials || '');
           setDimensions(p.dimensions || '');
           setCareInstructions(p.careInstructions || '');
+          if (p.images && p.images.length > 0) {
+            setImages(p.images.map((img: any) => img.url));
+          }
         }
       } catch (e) {
         console.error(e);
@@ -85,6 +90,7 @@ export default function AdminEditProductPage({ params }: { params: { id: string 
         materials,
         dimensions,
         careInstructions,
+        images,
       };
 
       const res = await fetch(`/api/products/${productSlug}`, {
@@ -170,6 +176,14 @@ export default function AdminEditProductPage({ params }: { params: { id: string 
               onChange={(e) => setDescription(e.target.value)}
               className="w-full bg-ivory-100 border border-sand-dark px-3.5 py-2.5 rounded-xl leading-relaxed"
             />
+          </div>
+
+          {/* Creation Images / Cloudinary Upload */}
+          <div className="pt-2">
+            <label className="font-semibold text-charcoal-800 block mb-2">
+              Creation Photos & Videos (Cloudinary Auto-Optimized)
+            </label>
+            <CloudinaryUploader images={images} onChange={setImages} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
