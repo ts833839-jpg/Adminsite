@@ -102,8 +102,39 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Products GET Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch products.' }, { status: 500 });
+    console.warn('Products GET Error, falling back to static catalog:', error);
+    try {
+      const staticData = await import('@/lib/catalog-static.json');
+      const sp = new URL(req.url).searchParams;
+      const cat = sp.get('category');
+      const q = sp.get('search');
+      let prods = (staticData.products || []) as any[];
+      if (cat) {
+        prods = prods.filter((p: any) => p.category?.slug === cat || p.categorySlug === cat);
+      }
+      if (q) {
+        const s = q.toLowerCase();
+        prods = prods.filter((p: any) =>
+          (p.name && p.name.toLowerCase().includes(s)) ||
+          (p.description && p.description.toLowerCase().includes(s)) ||
+          (p.materials && p.materials.toLowerCase().includes(s))
+        );
+      }
+      return NextResponse.json({
+        products: prods,
+        pagination: {
+          page: 1,
+          limit: prods.length,
+          totalCount: prods.length,
+          totalPages: 1,
+        },
+      });
+    } catch (e) {
+      return NextResponse.json({
+        products: [],
+        pagination: { page: 1, limit: 0, totalCount: 0, totalPages: 0 },
+      });
+    }
   }
 }
 
