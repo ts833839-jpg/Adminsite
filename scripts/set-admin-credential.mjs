@@ -19,15 +19,31 @@ async function updateAdmin() {
       email: 'admin@knotandbloom.com',
       passwordHash,
       role: 'ADMIN',
-      phone: '+91 98765 43210',
+      phone: '+91 9080236848',
+      avatar: '/avatars/admin.svg',
+    },
+  });
+
+  const suresh = await prisma.user.upsert({
+    where: { email: 'suresh140105@gmail.com' },
+    update: {
+      passwordHash,
+      name: 'Suresh - Master Artisan Admin',
+      role: 'ADMIN',
+    },
+    create: {
+      name: 'Suresh - Master Artisan Admin',
+      email: 'suresh140105@gmail.com',
+      passwordHash,
+      role: 'ADMIN',
+      phone: '+91 9080236848',
       avatar: '/avatars/admin.svg',
     },
   });
 
   console.log('✅ Admin credentials updated successfully in dev.db:');
-  console.log('👑 Role: ADMIN');
-  console.log('📧 Email: ' + updated.email);
-  console.log('🔑 Password: rajivani@1993');
+  console.log('👑 Account 1: admin@knotandbloom.com | rajivani@1993');
+  console.log('👑 Account 2: suresh140105@gmail.com | rajivani@1993');
 }
 
 updateAdmin()
