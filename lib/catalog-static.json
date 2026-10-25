@@ -12,7 +12,7 @@
       "createdAt": "2026-10-24T14:42:07.741Z",
       "updatedAt": "2026-10-25T06:22:32.221Z",
       "_count": {
-        "products": 16
+        "products": 17
       }
     },
     {
@@ -92,6 +92,55 @@
     }
   ],
   "products": [
+    {
+      "id": "cmv-new-creation-001",
+      "name": "new",
+      "slug": "new-crochet-creation",
+      "subtitle": "Artisan Bespoke Crochet Wear",
+      "description": "best product",
+      "details": "{\"Technique\":\"Handcrafted Crochet\",\"Artisan\":\"Knot & Bloom Atelier\"}",
+      "materials": "100% Combed Cotton Yarn, Fine Metallic Accents",
+      "dimensions": "Standard artisan scale",
+      "careInstructions": "Gentle cold handwash, dry flat in shade",
+      "categoryId": "cmvmiccn0000ad7hu2nfzrl36",
+      "price": 0,
+      "mrp": 0,
+      "discountPercent": 0,
+      "stock": 1,
+      "sku": "KB-CR-6401",
+      "rating": 5,
+      "reviewCount": 0,
+      "isActive": true,
+      "isFeatured": true,
+      "badge": "NEW",
+      "tags": "crochet, handcrafted, bespoke",
+      "createdAt": "2026-10-25T08:06:22.346Z",
+      "updatedAt": "2026-10-25T08:06:22.347Z",
+      "images": [
+        {
+          "id": "img-new-001",
+          "url": "https://res.cloudinary.com/zsjpdh9i/image/upload/v1792914991/knot-and-bloom/products/whatsapp-image-2026-10-24-at-4-57-47-pm-1341.jpg",
+          "isPrimary": true,
+          "order": 0
+        }
+      ],
+      "category": {
+        "id": "cmvmiccn0000ad7hu2nfzrl36",
+        "name": "Crochet Wear & Heirloom Dresses",
+        "slug": "crochet-wear",
+        "description": "Regal baby dresses, hand-hooked rompers, heirloom layettes, winter warmers, and festival shrugs.",
+        "image": "https://res.cloudinary.com/zsjpdh9i/image/upload/f_auto,q_auto/v1792909164/knot-and-bloom/products/colorful-crocheted-toddler-dress-front-and-back-4",
+        "bannerImage": null,
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-10-24T14:42:07.741Z",
+        "updatedAt": "2026-10-25T06:22:32.221Z",
+        "_count": {
+          "products": 17
+        }
+      },
+      "variants": []
+    },
     {
       "id": "cmvmlp7dz006p8tgmlikwujfv",
       "name": "Aqua & White Daisy Blossom Crochet Charm",

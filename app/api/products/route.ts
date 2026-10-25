@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
+import { getLiveCatalog, addProductToLiveCatalog } from '@/lib/cloud-catalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,79 +22,45 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '24', 10);
     const skip = (page - 1) * limit;
 
-    const where: any = {
-      isActive: true,
-      images: { some: {} },
-    };
+    // Fetch live catalog from Cloudinary CDN (instant cross-site sync)
+    const liveCatalog = await getLiveCatalog();
+    let prods = (liveCatalog.products || []) as any[];
 
     if (category) {
-      where.category = { slug: category };
+      prods = prods.filter(
+        (p: any) =>
+          p.category?.slug === category ||
+          p.categorySlug === category ||
+          p.categoryId === category
+      );
     }
 
     if (search) {
-      where.OR = [
-        { name: { contains: search } },
-        { subtitle: { contains: search } },
-        { description: { contains: search } },
-        { tags: { contains: search } },
-        { materials: { contains: search } },
-      ];
+      const q = search.toLowerCase();
+      prods = prods.filter(
+        (p: any) =>
+          (p.name && p.name.toLowerCase().includes(q)) ||
+          (p.description && p.description.toLowerCase().includes(q)) ||
+          (p.materials && p.materials.toLowerCase().includes(q)) ||
+          (p.category?.name && p.category.name.toLowerCase().includes(q)) ||
+          (p.tags && p.tags.toLowerCase().includes(q))
+      );
     }
 
     if (minPrice || maxPrice) {
-      where.price = {};
-      if (minPrice) where.price.gte = parseFloat(minPrice);
-      if (maxPrice) where.price.lte = parseFloat(maxPrice);
-    }
-
-    if (rating) {
-      where.rating = { gte: parseFloat(rating) };
+      if (minPrice) prods = prods.filter((p: any) => p.price >= parseFloat(minPrice));
+      if (maxPrice) prods = prods.filter((p: any) => p.price <= parseFloat(maxPrice));
     }
 
     if (badge) {
-      where.badge = badge.toUpperCase();
+      prods = prods.filter((p: any) => p.badge?.toUpperCase() === badge.toUpperCase());
     }
 
-    if (isUnder499 === 'true') {
-      where.price = { lte: 499 };
-    }
-
-    if (inStock === 'true') {
-      where.stock = { gt: 0 };
-    }
-
-    let orderBy: any = [{ isFeatured: 'desc' }, { createdAt: 'desc' }];
-    if (sort === 'newest') {
-      orderBy = { createdAt: 'desc' };
-    } else if (sort === 'price-asc') {
-      orderBy = { price: 'asc' };
-    } else if (sort === 'price-desc') {
-      orderBy = { price: 'desc' };
-    } else if (sort === 'popular') {
-      orderBy = { reviewCount: 'desc' };
-    } else if (sort === 'rating') {
-      orderBy = { rating: 'desc' };
-    } else if (sort === 'discount') {
-      orderBy = { discountPercent: 'desc' };
-    }
-
-    const [products, totalCount] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        include: {
-          images: { orderBy: { order: 'asc' } },
-          category: { select: { id: true, name: true, slug: true } },
-          variants: true,
-        },
-        orderBy,
-        skip,
-        take: limit,
-      }),
-      prisma.product.count({ where }),
-    ]);
+    const totalCount = prods.length;
+    const paginated = prods.slice(skip, skip + limit);
 
     return NextResponse.json({
-      products,
+      products: paginated,
       pagination: {
         page,
         limit,
@@ -102,39 +69,11 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.warn('Products GET Error, falling back to static catalog:', error);
-    try {
-      const staticData = await import('@/lib/catalog-static.json');
-      const sp = new URL(req.url).searchParams;
-      const cat = sp.get('category');
-      const q = sp.get('search');
-      let prods = (staticData.products || []) as any[];
-      if (cat) {
-        prods = prods.filter((p: any) => p.category?.slug === cat || p.categorySlug === cat);
-      }
-      if (q) {
-        const s = q.toLowerCase();
-        prods = prods.filter((p: any) =>
-          (p.name && p.name.toLowerCase().includes(s)) ||
-          (p.description && p.description.toLowerCase().includes(s)) ||
-          (p.materials && p.materials.toLowerCase().includes(s))
-        );
-      }
-      return NextResponse.json({
-        products: prods,
-        pagination: {
-          page: 1,
-          limit: prods.length,
-          totalCount: prods.length,
-          totalPages: 1,
-        },
-      });
-    } catch (e) {
-      return NextResponse.json({
-        products: [],
-        pagination: { page: 1, limit: 0, totalCount: 0, totalPages: 0 },
-      });
-    }
+    console.warn('Products GET Error:', error);
+    return NextResponse.json({
+      products: [],
+      pagination: { page: 1, limit: 0, totalCount: 0, totalPages: 0 },
+    });
   }
 }
 
@@ -241,6 +180,9 @@ export async function POST(req: NextRequest) {
     } catch (invErr) {
       console.warn('Inventory creation skipped:', invErr);
     }
+
+    // Automatically sync creation to live Cloudinary catalog for instant cross-site visibility
+    await addProductToLiveCatalog(product);
 
     return NextResponse.json({ success: true, product }, { status: 201 });
   } catch (error: any) {

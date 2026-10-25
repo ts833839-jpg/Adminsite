@@ -2,35 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
+import { getLiveCatalog } from '@/lib/cloud-catalog';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const categoriesRaw = await prisma.category.findMany({
-      where: {
-        isActive: true,
-        products: { some: { isActive: true } },
-      },
-      include: {
-        _count: {
-          select: { products: { where: { isActive: true } } },
-        },
-      },
-      orderBy: { order: 'asc' },
-    });
-    const categories = categoriesRaw.filter(
-      (c) => c._count.products > 0 && c.image && !c.image.includes('placeholder')
-    );
-    return NextResponse.json({ categories });
+    const live = await getLiveCatalog();
+    return NextResponse.json({ categories: live.categories || [] });
   } catch (error) {
-    console.error('Categories GET Error, falling back to static data:', error);
-    try {
-      const staticData = await import('@/lib/catalog-static.json');
-      return NextResponse.json({ categories: staticData.categories || [] });
-    } catch (e) {
-      return NextResponse.json({ categories: [] });
-    }
+    console.error('Categories GET Error:', error);
+    return NextResponse.json({ categories: [] });
   }
 }
 
