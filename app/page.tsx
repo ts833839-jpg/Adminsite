@@ -9,48 +9,61 @@ import { CustomerReviews } from '@/components/home/CustomerReviews';
 export const dynamic = 'force-dynamic';
 
 async function getHomepageData() {
-  const [categories, products] = await Promise.all([
-    prisma.category.findMany({
-      where: {
-        isActive: true,
-        products: { some: { isActive: true } },
-      },
-      include: {
-        _count: { select: { products: { where: { isActive: true } } } },
-      },
-      orderBy: { order: 'asc' },
-    }),
-    prisma.product.findMany({
-      where: {
-        isActive: true,
-        images: { some: {} },
-      },
-      include: {
-        images: { orderBy: { order: 'asc' } },
-        category: true,
-        variants: true,
-      },
-      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-      take: 100,
-    }),
-  ]);
+  try {
+    const [categories, products] = await Promise.all([
+      prisma.category.findMany({
+        where: {
+          isActive: true,
+          products: { some: { isActive: true } },
+        },
+        include: {
+          _count: { select: { products: { where: { isActive: true } } } },
+        },
+        orderBy: { order: 'asc' },
+      }),
+      prisma.product.findMany({
+        where: {
+          isActive: true,
+          images: { some: {} },
+        },
+        include: {
+          images: { orderBy: { order: 'asc' } },
+          category: true,
+          variants: true,
+        },
+        orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+        take: 100,
+      }),
+    ]);
 
-  const validCategories = categories.filter(
-    (c) => c._count?.products > 0 && c.image && !c.image.includes('placeholder')
-  );
+    const validCategories = categories.filter(
+      (c) => c._count?.products > 0 && c.image && !c.image.includes('placeholder')
+    );
 
-  const validProducts = products.filter(
-    (p) =>
-      p.name &&
-      p.images &&
-      p.images.length > 0 &&
-      p.images[0].url &&
-      !p.images[0].url.includes('placeholder')
-  );
+    const validProducts = products.filter(
+      (p) =>
+        p.name &&
+        p.images &&
+        p.images.length > 0 &&
+        p.images[0].url &&
+        !p.images[0].url.includes('placeholder')
+    );
 
+    if (validProducts.length > 0) {
+      return {
+        categories: JSON.parse(JSON.stringify(validCategories)),
+        products: JSON.parse(JSON.stringify(validProducts)),
+      };
+    }
+  } catch (err) {
+    console.warn('Prisma DB query error during static build, using fallback catalog data:', err);
+  }
+
+  // Fallback to static catalog data so page NEVER crashes during static build
+  const staticData = await import('@/lib/catalog-static.json');
   return {
-    categories: JSON.parse(JSON.stringify(validCategories)),
-    products: JSON.parse(JSON.stringify(validProducts)),
+    categories: staticData.categories || [],
+    products: staticData.products || [],
   };
 }
 

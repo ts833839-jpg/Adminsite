@@ -24,8 +24,13 @@ export async function GET() {
     );
     return NextResponse.json({ categories });
   } catch (error) {
-    console.error('Categories GET Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch categories.' }, { status: 500 });
+    console.error('Categories GET Error, falling back to static data:', error);
+    try {
+      const staticData = await import('@/lib/catalog-static.json');
+      return NextResponse.json({ categories: staticData.categories || [] });
+    } catch (e) {
+      return NextResponse.json({ categories: [] });
+    }
   }
 }
 

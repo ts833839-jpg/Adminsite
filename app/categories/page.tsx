@@ -6,20 +6,27 @@ import prisma from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export default async function CategoriesPage() {
-  const categoriesRaw = await prisma.category.findMany({
-    where: {
-      isActive: true,
-      products: { some: { isActive: true } },
-    },
-    include: {
-      _count: { select: { products: { where: { isActive: true } } } },
-    },
-    orderBy: { order: 'asc' },
-  });
+  let categories: any[] = [];
+  try {
+    const categoriesRaw = await prisma.category.findMany({
+      where: {
+        isActive: true,
+        products: { some: { isActive: true } },
+      },
+      include: {
+        _count: { select: { products: { where: { isActive: true } } } },
+      },
+      orderBy: { order: 'asc' },
+    });
 
-  const categories = categoriesRaw.filter(
-    (cat) => cat._count.products > 0 && cat.image && !cat.image.includes('placeholder')
-  );
+    categories = categoriesRaw.filter(
+      (cat) => cat._count.products > 0 && cat.image && !cat.image.includes('placeholder')
+    );
+  } catch (err) {
+    console.warn('Categories query error, using static fallback:', err);
+    const staticData = await import('@/lib/catalog-static.json');
+    categories = (staticData.categories || []) as any[];
+  }
 
   return (
     <div className="min-h-screen bg-ivory-100 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">

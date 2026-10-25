@@ -8,8 +8,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
+  const { slug } = params;
   try {
-    const { slug } = params;
 
     const product = await prisma.product.findFirst({
       where: {
@@ -48,7 +48,17 @@ export async function GET(
 
     return NextResponse.json({ product, relatedProducts });
   } catch (error) {
-    console.error('Product Detail GET Error:', error);
+    console.error('Product Detail GET Error, falling back to static catalog:', error);
+    try {
+      const staticData = await import('@/lib/catalog-static.json');
+      const prod = (staticData.products || []).find((p: any) => p.slug === slug || p.id === slug);
+      if (prod) {
+        const related = (staticData.products || [])
+          .filter((p: any) => p.categoryId === prod.categoryId && p.id !== prod.id)
+          .slice(0, 4);
+        return NextResponse.json({ product: prod, relatedProducts: related });
+      }
+    } catch (e) {}
     return NextResponse.json({ error: 'Failed to fetch product.' }, { status: 500 });
   }
 }
