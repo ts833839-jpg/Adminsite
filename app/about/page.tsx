@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Sparkles, Heart, Award, ArrowRight, ShieldCheck } from 'lucide-react';
+import ArtisanGenesisShowcase from '@/components/about/ArtisanGenesisShowcase';
 
 export const metadata = {
   title: 'About Knot & Bloom — Handcrafted Crochet & Artisan Portfolio',
@@ -49,12 +50,8 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="rounded-3xl overflow-hidden border-2 border-gold-500/30 shadow-royal-lg aspect-[4/3] bg-maroon-900">
-            <img
-              src="/products/crochet-palace-potli.svg"
-              alt="Atelier Craftsmanship"
-              className="w-full h-full object-cover"
-            />
+          <div>
+            <ArtisanGenesisShowcase />
           </div>
         </div>
       </section>
